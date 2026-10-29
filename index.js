@@ -1,0 +1,30 @@
+
+const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+
+app.get("/", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  if (mode === "subscribe" && token === VERIFY_TOKEN && VERIFY_TOKEN) {
+    console.log("Webhook verificado correctamente");
+    return res.status(200).send(challenge);
+  }
+
+  return res.status(403).send("Verificación fallida");
+});
+
+app.post("/", (req, res) => {
+  console.log("Evento recibido:", JSON.stringify(req.body));
+  res.sendStatus(200);
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor funcionando en puerto ${PORT}`);
+});
